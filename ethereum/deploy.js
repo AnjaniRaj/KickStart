@@ -4,7 +4,7 @@ const compiledFactory = require('./build/CampaignFactory');
 
 const provider = new HDWalletProvider(
     'mnemonic',
-    'infura url'
+    'https://ropsten.infura.io/v3/de72ca31dd2544fd8c1b4fb64dfefc8f'
 );
 const web3 = new Web3(provider);
 
@@ -33,4 +33,4 @@ const deploy = async () => {
 };
 
 deploy();
-// contract address = 0x47d64DEB1F26afB4e5dF36d20958157B0b6AE8b6
+// contract address =  0x47d64DEB1F26afB4e5dF36d20958157B0b6AE8b6

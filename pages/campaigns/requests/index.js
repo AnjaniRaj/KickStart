@@ -1,0 +1,67 @@
+import React, {Component} from 'react';
+import {Button, Table} from "semantic-ui-react";
+import Campaign from '../../../ethereum/campaign';
+import Layout from '../../../components/Layout';
+import {Link} from '../../../routes';
+import RequestRow from '../../../components/RequestRow';
+
+class RequestIndex extends Component {
+
+    static async getInitialProps({query}) {
+        const campaign = Campaign(query.address);
+        const requestCount = await campaign.methods.getRequestsCount().call();
+        const approversCount = await campaign.methods.approversCount().call();
+        const requests = await Promise.all(
+            Array(parseInt(requestCount)).fill().map((element, index) => {
+                return campaign.methods.requests(index).call();
+            })
+        );
+        return {address: query.address, requests, requestCount, approversCount};
+    }
+
+    renderRows(){
+        return this.props.requests.map((request,index)=>{
+            return <RequestRow
+                key={index}
+                id={index}
+                request={request}
+                address={this.props.address}
+                approversCount={this.props.approversCount}
+            />;
+        })
+    }
+
+    render() {
+        const {Header, Row, HeaderCell, Body} = Table;
+        return (
+            <Layout>
+                <h3>Requests</h3>
+                <Link route={`/campaigns/${this.props.address}/requests/new`}>
+                    <a>
+                        <Button floated={"right"} style={{ marginBottom: 10 }} primary>Add Request</Button>
+                    </a>
+                </Link>
+                <Table>
+                    <Header>
+                        <Row>
+                            <HeaderCell>No.</HeaderCell>
+                            <HeaderCell>Description</HeaderCell>
+                            <HeaderCell>Amount</HeaderCell>
+                            <HeaderCell>Recipient</HeaderCell>
+                            <HeaderCell>Approval</HeaderCell>
+                            <HeaderCell>Approve</HeaderCell>
+                            <HeaderCell>Finalize</HeaderCell>
+                        </Row>
+                    </Header>
+
+                    <Body>
+                        {this.renderRows()}
+                    </Body>
+                </Table>
+                <div>Found {this.props.requestCount}</div>
+            </Layout>
+        );
+    }
+}
+
+export default RequestIndex;
